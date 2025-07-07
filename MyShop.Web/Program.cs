@@ -53,8 +53,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 #endregion
-WebApplication app = builder.Build();
 
+
+WebApplication app = builder.Build();
+using (IServiceScope scope = app.Services.CreateScope())
+{
+    MyShopContext db = scope.ServiceProvider.GetRequiredService<MyShopContext>();
+    db.Database.Migrate();
+}
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

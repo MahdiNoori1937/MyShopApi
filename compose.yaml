@@ -1,6 +1,32 @@
-﻿services:
-  myshop.web:
-    image: myshop.web
+﻿version: '3.9'
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver_container
+    environment:
+      SA_PASSWORD: "123456789"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "2050:2050"
+    volumes:
+      - E:\mynewssms\log:/var/opt/mssql/log
+    restart: always
+
+  web:
     build:
       context: .
-      dockerfile: MyShop.Web/Dockerfile
+      dockerfile: MyApp.API/Dockerfile
+    container_name: myapp_web
+    depends_on:
+      - sqlserver
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: "Server=sqlserver;Database=MyShopApp;User Id=sa;Password=123456789;TrustServerCertificate=true"
+    ports:
+      - "5000:80"
+    restart: on-failure
+
+
+volumes:
+  sql_data:
