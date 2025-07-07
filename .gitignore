@@ -1,5 +1,16 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# build
 bin/
 obj/
-/packages/
-riderModule.iml
-/_ReSharper.Caches/
+
+# Rider / IntelliJ / Resharper
+.idea/
+*.DotSettings
+
+# system
+*.log
+*.DS_Store

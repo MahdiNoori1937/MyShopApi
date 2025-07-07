@@ -1,4 +1,4 @@
-﻿namespace LibraryApi.Domain.Interfaces.IUnitOfWorkInterface;
+﻿namespace MyShop.Domain.Interfaces.IUnitOfWorkInterface;
 
 public interface IUnitOfWorkRepository
 {

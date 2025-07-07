@@ -1,16 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
     </PropertyGroup>
 
     <ItemGroup>
       <Folder Include="Authentication\" />
-      <Folder Include="FileStorage\" />
-      <Folder Include="Repositories\" />
       <Folder Include="ShopMigrations\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\MyShop.Domain\MyShop.Domain.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -24,10 +26,6 @@
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\MyShop.Domain\MyShop.Domain.csproj" />
     </ItemGroup>
 
 </Project>
