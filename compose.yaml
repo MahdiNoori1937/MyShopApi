@@ -1,0 +1,6 @@
+﻿services:
+  myshop.web:
+    image: myshop.web
+    build:
+      context: .
+      dockerfile: MyShop.Web/Dockerfile
