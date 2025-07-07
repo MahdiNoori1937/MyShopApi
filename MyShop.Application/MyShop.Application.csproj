@@ -6,4 +6,14 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <Folder Include="Commonn\Dtos\" />
+      <Folder Include="Commonn\Interfaces\" />
+      <Folder Include="Commonn\Messages\" />
+      <Folder Include="Commonn\Response\" />
+      <Folder Include="Commonn\Security\" />
+      <Folder Include="Extensions\" />
+      <Folder Include="Feature\" />
+    </ItemGroup>
+
 </Project>
