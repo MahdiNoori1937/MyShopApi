@@ -1,7 +1,7 @@
 ﻿using MediatR;
-using MyShop.Application.Feature.Product.DTOs;
+using MyShop.Application.Feature.User.DTOs;
 
-namespace MyShop.Application.Feature.Product.Command;
+namespace MyShop.Application.Feature.User.Command;
 
 public class CreateUserCommand : IRequest<CreateUserStatusDto>
 {
@@ -28,5 +28,15 @@ public class DeleteUserCommand : IRequest<DeleteUserStatusDto>
     public DeleteUserCommand(int userid)
     {
         Userid = userid;
+    }
+}
+
+public class RegisterUserCommand : IRequest<RegisterUserStatusDto>
+{
+    public RegisterUserDto RegisterUserDto { get; set; }
+
+    public RegisterUserCommand(RegisterUserDto RegisterUserDto)
+    {
+        RegisterUserDto = RegisterUserDto;
     }
 }

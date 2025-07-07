@@ -1,16 +1,11 @@
 ﻿using System.Security.Claims;
 
-namespace LibraryApi.Web.Extensions;
+namespace MyShop.Web.Extensions;
 
 public static class GetUserValue
 {
     public static int? GetUserId(this HttpContext httpContext)
     {
-        return int.Parse(httpContext.User.FindFirstValue("Id"));
+        return int.Parse(httpContext.User.FindFirstValue("Id")?? "0");
     }  
-    public static string? GetUserRoleTitle(this HttpContext httpContext)
-    {
-        return httpContext.User.FindFirstValue("RoleTitle");
-    }
-    
 }

@@ -12,7 +12,8 @@ public class CreateProductDtoValidator : AbstractValidator<CreateProductDto>
     {
         RuleFor(c => c.UserId).NotEmpty().WithMessage("لطفا شناسه کاربری را ارسال کنید");
 
-        RuleFor(c => c.ManufactureEmail).EmailAddress().WithMessage("لطفا ایمیل به صورت صحیح وارد کنید")
+        RuleFor(c => c.ManufactureEmail).NotEmpty().WithMessage("لطفا ایمیل محصول را وارد کنید")
+            .EmailAddress().WithMessage("لطفا ایمیل به صورت صحیح وارد کنید")
             .MinimumLength(10).WithMessage("لطفا ایمیل بیشتر از 10 کاراکتر باشد")
             .MaximumLength(190).WithMessage("لطفا ایمیل کمتر از 50 کاراکتر باشد");
         

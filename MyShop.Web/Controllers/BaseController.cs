@@ -1,24 +1,18 @@
 using FluentValidation;
 using FluentValidation.Results;
-using LibraryApi.Application.Common.Messages;
-using LibraryApi.Application.Response;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using MyShop.Application.Commonn.Messages;
+using MyShop.Application.Commonn.Response;
 
-namespace LibraryApi.Web.Controllers;
+namespace MyShop.Web.Controllers;
 
 [ApiController]
 [Route("/api/[controller]/[action]")]
-public abstract class ApiBaseController : ControllerBase
+public abstract class ApiBaseController(IMediator mediator, StatusMessageProvider responseMessage) : ControllerBase
 {
-    protected readonly IMediator _mediator;
-    protected readonly StatusMessageProvider _responseMessage;
-
-    protected ApiBaseController(IMediator mediator, StatusMessageProvider responseMessage)
-    {
-        _mediator = mediator;
-        _responseMessage = responseMessage;
-    }
+    protected readonly IMediator _mediator = mediator;
+    protected readonly StatusMessageProvider _responseMessage = responseMessage;
 
     protected IActionResult OkResponse<T>(T data, string message = "عملیات موفقیت‌آمیز بود")
     {

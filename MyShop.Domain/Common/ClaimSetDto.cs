@@ -1,8 +1,7 @@
-﻿namespace LibraryApi.Domain.Common;
+﻿namespace MyShop.Domain.Common;
 
 public class ClaimSetDto
 {
     public int Id { get; set; }
-
-    public string RoleTitle { get; set; }
+    
 }

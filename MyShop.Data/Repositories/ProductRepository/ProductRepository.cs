@@ -34,6 +34,15 @@ public class ProductRepository(MyShopContext _db):IProductRepository
 
     public IQueryable<Product> Query()
     {
-        return _db.Products.AsQueryable();
+        return _db.Products
+            .Where(c=>!c.IsDelete)
+            .OrderBy(c=>c.CreateDate)
+            .Include(c=>c.User)
+            .AsQueryable();
+    }
+
+    public async Task<bool> IsUniqueEmailAsync(string email, DateTime CreateDate)
+    {
+        return await _db.Products.AnyAsync(c=>c.ManufactureEmail==email || c.CreateDate==CreateDate);
     }
 }

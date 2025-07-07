@@ -1,4 +1,4 @@
-﻿namespace LibraryApi.Application.Extensions;
+﻿namespace MyShop.Application.Extensions;
 
 public static class ModelExtensions
 {

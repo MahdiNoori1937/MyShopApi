@@ -8,6 +8,9 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0" />
+        <PackageReference Include="MediatR" Version="12.5.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.17" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.17" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.17" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.17">
@@ -24,7 +27,9 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\MyShop.Application\MyShop.Application.csproj" />
       <ProjectReference Include="..\MyShop.Data\MyShop.Data.csproj" />
+      <ProjectReference Include="..\MyShop.IOC\MyShop.IOC.csproj" />
     </ItemGroup>
 
 </Project>

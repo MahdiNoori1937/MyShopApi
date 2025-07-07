@@ -9,11 +9,17 @@
     <ItemGroup>
       <Folder Include="Commonn\Dtos\" />
       <Folder Include="Commonn\Interfaces\" />
-      <Folder Include="Commonn\Messages\" />
-      <Folder Include="Commonn\Response\" />
-      <Folder Include="Commonn\Security\" />
-      <Folder Include="Extensions\" />
-      <Folder Include="Feature\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+      <PackageReference Include="FluentValidation" Version="12.0.0" />
+      <PackageReference Include="MediatR" Version="12.5.0" />
+      <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.1.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\MyShop.Data\MyShop.Data.csproj" />
     </ItemGroup>
 
 </Project>

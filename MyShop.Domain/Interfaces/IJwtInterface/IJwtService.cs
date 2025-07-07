@@ -1,6 +1,6 @@
-﻿using LibraryApi.Domain.Common;
+﻿using MyShop.Domain.Common;
 
-namespace LibraryApi.Domain.Interfaces.IJwtInterface;
+namespace MyShop.Domain.Interfaces.IJwtInterface;
 
 public interface IJwtService
 {

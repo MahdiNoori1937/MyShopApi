@@ -1,6 +1,6 @@
-﻿using LibraryApi.Application.Response;
+﻿using MyShop.Application.Commonn.Response;
 
-namespace LibraryApi.Application.Extensions;
+namespace MyShop.Application.Extensions;
 
 public class EnumResponse<TEnum> where TEnum : Enum
 {

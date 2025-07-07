@@ -1,12 +1,12 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using LibraryApi.Domain.Common;
-using LibraryApi.Domain.Interfaces.IJwtInterface;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using MyShop.Domain.Common;
+using MyShop.Domain.Interfaces.IJwtInterface;
 
-namespace LibraryApi.Data.Authentication.Jwt;
+namespace MyShop.Data.Authentication.Jwt;
 
 public class JwtService:IJwtService
 {
@@ -24,14 +24,13 @@ public class JwtService:IJwtService
         List<Claim> claims = new()
         {
             new Claim("Id", claimSetDto.Id.ToString()),
-            new Claim("RoleTitle", claimSetDto.RoleTitle)
         };
         
         SigningCredentials credentials = new SigningCredentials(_key, SecurityAlgorithms.HmacSha256);
 
         JwtSecurityToken jwtSecurityToken = new(
-            issuer: "https://localhost:7184",
-            audience: "https://localhost:7184",
+            issuer: "https://localhost:7151",
+            audience: "https://localhost:7151",
             claims: claims,
             expires: DateTime.Now.AddDays(20),
             signingCredentials: credentials

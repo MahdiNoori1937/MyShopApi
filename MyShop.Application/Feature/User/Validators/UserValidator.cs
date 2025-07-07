@@ -1,15 +1,14 @@
-﻿using MyShop.Application.Feature.Product.Command;
+﻿using MyShop.Application.Commonn.Security;
 using MyShop.Application.Feature.User.DTOs;
-using MyShop.Domain.Interfaces.IProductInterface;
 using MyShop.Domain.Interfaces.IUserInterface;
 
-namespace MyShop.Application.Feature.Product.Validators;
+namespace MyShop.Application.Feature.User.Validators;
 
-public class CreateProductValidator
+public class CreateUserValidator
 {
     private readonly IUserRepository _userRepository;
 
-    public CreateProductValidator(IUserRepository userRepository)
+    public CreateUserValidator(IUserRepository userRepository)
     {
         _userRepository = userRepository;
     }
@@ -24,11 +23,11 @@ public class CreateProductValidator
         return CreateUserStatusDto.Success;
     }
 }
-public class UpdateProductValidator
+public class UpdateUserValidator
 {
     private readonly IUserRepository _userRepository;
 
-    public UpdateProductValidator(IUserRepository userRepository)
+    public UpdateUserValidator(IUserRepository userRepository)
     {
         _userRepository = userRepository;
     }
@@ -36,6 +35,11 @@ public class UpdateProductValidator
     public async Task<UpdateUserStatusDto> Validate(UpdateUserDto UpdateUserDto,Domain.Entities.UserEntity.User? user )
     {
         if (user==null)
+        {
+            return UpdateUserStatusDto.NotFound;
+        }
+
+        if (!SecretHasher.Verify(UpdateUserDto.OldPassword, user.Password))
         {
             return UpdateUserStatusDto.NotFound;
         }
@@ -51,5 +55,43 @@ public class UpdateProductValidator
         }
 
         return UpdateUserStatusDto.Success;
+    }
+}
+
+public class DeleteUserValidator
+{
+    public async Task<DeleteUserStatusDto> Validate(Domain.Entities.UserEntity.User? user)
+    {
+        if (user==null)
+        {
+            return DeleteUserStatusDto.NotFound;
+        }
+
+        return DeleteUserStatusDto.Success;
+    }
+}
+public class LoginUserValidator
+{
+    public async Task<LoginUserStatusDto> Validate(LoginUserDto Model,Domain.Entities.UserEntity.User? user)
+    {
+        if (user==null)
+            return LoginUserStatusDto.Failed;
+        
+        if (!SecretHasher.Verify(Model.Password, user.Password))
+            return LoginUserStatusDto.Failed;
+
+        return LoginUserStatusDto.Success;
+    }
+}
+public class RegisterUserValidator(IUserRepository userRepository)
+{
+    public async Task<RegisterUserStatusDto> Validate(RegisterUserDto registerUserDto)
+    {
+        if (await userRepository.IsUserExistAsyncEmailOrMobile(registerUserDto.Email,registerUserDto.Phone))
+        {
+            return RegisterUserStatusDto.DuplicateInformation;
+        }
+
+        return RegisterUserStatusDto.Success;
     }
 }

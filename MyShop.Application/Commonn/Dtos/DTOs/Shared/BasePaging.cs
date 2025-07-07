@@ -1,4 +1,4 @@
-﻿namespace LibraryApi.Domain.Shared;
+﻿namespace MyShop.Application.Commonn.Dtos.DTOs.Shared;
 
 public class BasePaging<T>
 {

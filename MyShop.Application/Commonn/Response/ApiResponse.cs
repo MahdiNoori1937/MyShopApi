@@ -1,4 +1,4 @@
-﻿namespace LibraryApi.Application.Response;
+﻿namespace MyShop.Application.Commonn.Response;
 
 public class ApiResponse<T>
 {

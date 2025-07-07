@@ -39,7 +39,7 @@ public class UserRepository(MyShopContext _db): IUserRepository
 
     public async Task<User?> GetByEmailAsync(string email)
     {
-        return await _db.Users.FirstOrDefaultAsync(c => c.Email == email);
+        return await _db.Users.FirstOrDefaultAsync(c => c.Email == email && !c.IsDelete);
     }
 
     public async Task<bool> IsUserExistAsyncEmailOrMobile(string? email, string? mobile)

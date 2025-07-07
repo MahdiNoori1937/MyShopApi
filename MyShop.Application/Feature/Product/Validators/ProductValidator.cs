@@ -1,53 +1,45 @@
-﻿using MyShop.Application.Feature.User.DTOs;
+﻿using MyShop.Application.Feature.Product.DTOs;
+using MyShop.Application.Feature.User.DTOs;
+using MyShop.Domain.Interfaces.IProductInterface;
 using MyShop.Domain.Interfaces.IUserInterface;
 
-namespace MyShop.Application.Feature.User.Validators;
+namespace MyShop.Application.Feature.Product.Validators;
 
-public class CreateProductValidator
+public class CreateProductValidator(IProductRepository productRepository)
 {
-    private readonly IUserRepository _userRepository;
-
-    public CreateProductValidator(IUserRepository userRepository)
+    public async Task<CreateProductStatusDto> Validate(CreateProductDto createProductDto)
     {
-        _userRepository = userRepository;
-    }
-
-    public async Task<CreateUserStatusDto> Validate(CreateUserDto createUserDto)
-    {
-        if (await _userRepository.IsUserExistAsyncEmailOrMobile(createUserDto.Email,createUserDto.Phone))
+        if (await productRepository.IsUniqueEmailAsync(createProductDto.ManufactureEmail,DateTime.Now))
         {
-            return CreateUserStatusDto.DuplicateInformation;
+            return CreateProductStatusDto.DuplicateInformation;
         }
 
-        return CreateUserStatusDto.Success;
+        return CreateProductStatusDto.Success;
     }
 }
 public class UpdateProductValidator
 {
-    private readonly IUserRepository _userRepository;
-
-    public UpdateProductValidator(IUserRepository userRepository)
+    public async Task<UpdateProductStatusDto> Validate(Domain.Entities.ProductEntity.Product? product,int userId )
     {
-        _userRepository = userRepository;
-    }
-
-    public async Task<UpdateUserStatusDto> Validate(UpdateUserDto UpdateUserDto,Domain.Entities.UserEntity.User? user )
-    {
-        if (user==null)
-        {
-            return UpdateUserStatusDto.NotFound;
-        }
-        bool isEmailChanged = UpdateUserDto.Email != user.Email;
-        bool isMobileChanged = UpdateUserDto.Phone != user.Phone;
-        string? emailToCheck = isEmailChanged ? UpdateUserDto.Email : null;
-        string? mobileToCheck = isMobileChanged ? UpdateUserDto.Phone : null;
+        if (product==null)
+            return UpdateProductStatusDto.NotFound;
+        if (product.UserId != userId)
+            return UpdateProductStatusDto.DontHavePermission;
         
-        if ((isEmailChanged || isMobileChanged) &&
-            await _userRepository.IsUserExistAsyncEmailOrMobile(emailToCheck, mobileToCheck))
-        {
-            return UpdateUserStatusDto.DuplicateInformation;
-        }
+        return UpdateProductStatusDto.Success;
+    }
+}
 
-        return UpdateUserStatusDto.Success;
+public class DeleteProductValidator
+{
+    public async Task<DeleteProductStatusDto> Validate(Domain.Entities.ProductEntity.Product? product,int userId )
+    {
+        if (product==null)
+            return DeleteProductStatusDto.NotFound;
+        
+        if (product.UserId != userId)
+            return DeleteProductStatusDto.DontHavePermission;
+        
+        return DeleteProductStatusDto.Success;
     }
 }

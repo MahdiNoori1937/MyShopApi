@@ -1,32 +1,32 @@
 ﻿using MediatR;
-using MyShop.Application.Feature.User.DTOs;
+using MyShop.Application.Feature.Product.DTOs;
 
-namespace MyShop.Application.Feature.User.Command;
+namespace MyShop.Application.Feature.Product.Command;
 
-public class CreateUserCommand : IRequest<CreateUserStatusDto>
+public class CreateProductCommand : IRequest<CreateProductStatusDto>
 {
-    public CreateUserDto UserDto { get; set; }
+    public CreateProductDto ProductDto { get; set; }
 
-    public CreateUserCommand(CreateUserDto userDto)
+    public CreateProductCommand(CreateProductDto productDto)
     {
-        UserDto = userDto;
+        ProductDto = productDto;
     }
 }
-public class UpdateUserCommand : IRequest<UpdateUserStatusDto>
+public class UpdateProductCommand : IRequest<UpdateProductStatusDto>
 {
-    public UpdateUserDto UserDto { get; set; }
+    public UpdateProductDto ProductDto { get; set; }
 
-    public UpdateUserCommand(UpdateUserDto userDto)
+    public UpdateProductCommand(UpdateProductDto productDto)
     {
-        UserDto = userDto;
+        ProductDto = productDto;
     }
 }
-public class DeleteUserCommand : IRequest<DeleteUserStatusDto>
+public class DeleteProductCommand : IRequest<DeleteProductStatusDto>
 {
-    public int Userid { get; set; }
+    public DeleteProductDto ProductDto { get; set; }
 
-    public DeleteUserCommand(int userid)
+    public DeleteProductCommand(DeleteProductDto productDto)
     {
-        Userid = userid;
+        ProductDto = productDto;
     }
 }

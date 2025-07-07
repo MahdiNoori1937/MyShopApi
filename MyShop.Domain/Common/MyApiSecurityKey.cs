@@ -1,4 +1,4 @@
-﻿namespace LibraryApi.Domain.Common;
+﻿namespace MyShop.Domain.Common;
 
 public class MyApiSecurityKey
 {

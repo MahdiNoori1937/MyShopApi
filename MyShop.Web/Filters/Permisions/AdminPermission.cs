@@ -1,23 +1,19 @@
-﻿using LibraryApi.Web.Extensions;
+﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace LibraryApi.Web.Filters.Permisions;
+namespace MyShop.Web.Filters.Permisions;
 
-public class AdminPermissionsAttribute:AuthorizeAttribute,IAsyncAuthorizationFilter
+public class PermissionsAttribute:AuthorizeAttribute,IAsyncAuthorizationFilter
 {
     public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
     {
-        if (!context.HttpContext.User.Identity.IsAuthenticated)
+        ClaimsPrincipal user = context.HttpContext.User;
+        
+        if (user?.Identity == null || !user.Identity.IsAuthenticated)
         {
             context.Result = new UnauthorizedResult();
-            return;
-        }
-        
-        if (context.HttpContext.GetUserRoleTitle() != "Admin")
-        {
-            context.Result = new ForbidResult();
             return;
         }
         
