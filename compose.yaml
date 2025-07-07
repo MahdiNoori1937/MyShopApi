@@ -16,7 +16,7 @@ services:
   web:
     build:
       context: .
-      dockerfile: MyApp.API/Dockerfile
+      dockerfile: MyShop.Web/Dockerfile
     container_name: myapp_web
     depends_on:
       - sqlserver
@@ -24,7 +24,7 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       ConnectionStrings__DefaultConnection: "Server=sqlserver;Database=MyShopApp;User Id=sa;Password=123456789;TrustServerCertificate=true"
     ports:
-      - "5000:80"
+      - "5000:5000"
     restart: on-failure
 
 

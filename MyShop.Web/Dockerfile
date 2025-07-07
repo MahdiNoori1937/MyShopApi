@@ -8,6 +8,11 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["MyShop.Web/MyShop.Web.csproj", "MyShop.Web/"]
+COPY ["MyShop.Application/MyShop.Application.csproj", "MyShop.Application/"]
+COPY ["MyShop.Data/MyShop.Data.csproj", "MyShop.Data/"]
+COPY ["MyShop.IOC/MyShop.IOC.csproj", "MyShop.IOC/"]
+COPY ["MyShop.Domain/MyShop.Domain.csproj", "MyShop.Domain/"]
+COPY ["MyShop.Test/MyShop.Test.csproj", "MyShop.Test/"]
 RUN dotnet restore "MyShop.Web/MyShop.Web.csproj"
 COPY . .
 WORKDIR "/src/MyShop.Web"
