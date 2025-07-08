@@ -18,7 +18,7 @@
 ## 🧪 پیش‌نیازها
 
 - [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download)
-- پایگاه داده (PostgreSQL یا SQL Server)
+- پایگاه داده (SQSQL Server)
 - Visual Studio 2022 / Rider / VS Code
 
 ## ⚙️ نحوه اجرا
