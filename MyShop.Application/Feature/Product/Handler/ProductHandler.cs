@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using MediatR;
+using MyShop.Application.Common.Interfaces;
 using MyShop.Application.Feature.Product.Command;
 using MyShop.Application.Feature.Product.DTOs;
 using MyShop.Application.Feature.Product.Queries;
@@ -10,41 +11,51 @@ using MyShop.Domain.Interfaces.IUnitOfWorkInterface;
 
 namespace MyShop.Application.Feature.Product.Handler;
 
+#region CreateProductHandler
+
 public class CreateProductHandler(
     IProductRepository productRepository,
     IUnitOfWorkRepository unitOfWorkRepository,
     IMapper mapper,
-    IProductValidatorService validator)
+    IProductValidatorService validator,
+    IHttpContextService httpContextService)
     : IRequestHandler<CreateProductCommand, CreateProductStatusDto>
 {
     public async Task<CreateProductStatusDto> Handle(CreateProductCommand request, CancellationToken cancellationToken)
     {
+        request.ProductDto.UserId= httpContextService.GetUserId();
         CreateProductStatusDto status = await validator.CreateValidate(request.ProductDto);
         if (status != CreateProductStatusDto.Success)
             return status;
         
-        Domain.Entities.ProductEntity.Product product = mapper.Map<Domain.Entities.ProductEntity.Product>(request.ProductDto);
+        Domain.Entities.ProductEntity.Product? product = mapper.Map<Domain.Entities.ProductEntity.Product>(request.ProductDto);
 
         
-            await productRepository.AddAsync(product);
-            await unitOfWorkRepository.SaveChangesAsync();
-            if (product.Id == null)
-                return CreateProductStatusDto.Failed;
-            return CreateProductStatusDto.Success;
+        await productRepository.AddAsync(product);
+        await unitOfWorkRepository.SaveChangesAsync();
+        if (product.Id == 0)
+            return CreateProductStatusDto.Failed;
+        return CreateProductStatusDto.Success;
     }
 }
+
+#endregion
+
+#region UpdateProductHandler
 
 public class UpdateProductHandler(
     IProductRepository productRepository,
     IUnitOfWorkRepository unitOfWorkRepository,
     IMapper mapper,
-    IProductValidatorService validator)
+    IProductValidatorService validator,
+    IHttpContextService httpContextService)
     : IRequestHandler<UpdateProductCommand, UpdateProductStatusDto>
 {
     public async Task<UpdateProductStatusDto> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
     {
         Domain.Entities.ProductEntity.Product product = await productRepository.GetByIdAsync(request.ProductDto.Id)?? new();
         
+        request.ProductDto.UserId=httpContextService.GetUserId();
         UpdateProductStatusDto status = await validator.UpdateValidate(product,request.ProductDto.UserId);
         if (status != UpdateProductStatusDto.Success)
             return status;
@@ -52,30 +63,42 @@ public class UpdateProductHandler(
         Domain.Entities.ProductEntity.Product? productMapper  = mapper.Map(request.ProductDto,product);
 
         
-            await productRepository.UpdateAsync(productMapper);
-            await unitOfWorkRepository.SaveChangesAsync();
-            return UpdateProductStatusDto.Success;
+        await productRepository.UpdateAsync(productMapper);
+        await unitOfWorkRepository.SaveChangesAsync();
+        return UpdateProductStatusDto.Success;
     }
 }
+
+#endregion
+
+#region DeleteProductHandler
+
 public class DeleteProductHandler(
     IProductRepository productRepository,
     IUnitOfWorkRepository unitOfWorkRepository,
-    IProductValidatorService validator)
+    IProductValidatorService validator,
+    IHttpContextService httpContextService)
     : IRequestHandler<DeleteProductCommand, DeleteProductStatusDto>
 {
     public async Task<DeleteProductStatusDto> Handle(DeleteProductCommand request, CancellationToken cancellationToken)
     {
-       Domain.Entities.ProductEntity.Product product = await productRepository.GetByIdAsync(request.ProductDto.ProductId)?? new();
+        request.ProductDto.UserId= httpContextService.GetUserId();
+        Domain.Entities.ProductEntity.Product product = await productRepository.GetByIdAsync(request.ProductDto.ProductId)?? new();
        
-       DeleteProductStatusDto status = await validator.DeleteValidate(product,request.ProductDto.UserId);
-       if (status != DeleteProductStatusDto.Success)
-           return status;
+        request.ProductDto.UserId=httpContextService.GetUserId();
+        DeleteProductStatusDto status = await validator.DeleteValidate(product,request.ProductDto.UserId);
+        if (status != DeleteProductStatusDto.Success)
+            return status;
        
-       await productRepository.DeleteAsync(product);
-       await unitOfWorkRepository.SaveChangesAsync();
-       return DeleteProductStatusDto.Success;
+        await productRepository.DeleteAsync(product);
+        await unitOfWorkRepository.SaveChangesAsync();
+        return DeleteProductStatusDto.Success;
     }
 }
+
+#endregion
+
+#region GetProductHandler
 
 public class GetProductHandler(IProductRepository productRepository, IMapper mapper)
     : IRequestHandler<GetProductQueries, ProductDto>
@@ -85,6 +108,10 @@ public class GetProductHandler(IProductRepository productRepository, IMapper map
         return mapper.Map<ProductDto>(await productRepository.GetByIdAsync(request.Id));
     }
 }
+
+#endregion
+
+#region ListProductHandler
 
 public class ListProductHandler(IProductRepository productRepository)
     : IRequestHandler<ListProductQueries, SearchProductDto>
@@ -116,7 +143,7 @@ public class ListProductHandler(IProductRepository productRepository)
             ManufacturePhone = p.ManufacturePhone,
             CreateDate = p.CreateDate,
             UserId = p.UserId,
-            FullName = p.User.FullName,
+            FullName = p.User!.FullName,
         }));
 
         return request.SearchProductDto;
@@ -125,3 +152,5 @@ public class ListProductHandler(IProductRepository productRepository)
 
     }
 }
+
+#endregion

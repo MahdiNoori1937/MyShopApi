@@ -8,7 +8,7 @@ namespace MyShop.Application.Feature.User.Validators;
 
 public class CreateUserDtoValidator : AbstractValidator<CreateUserDto>
 {
-    public CreateUserDtoValidator(IUserRepository repo)
+    public CreateUserDtoValidator()
     {
         RuleFor(c => c.Email).EmailAddress().WithMessage("لطفا ایمیل به صورت صحیح وارد کنید")
             .MinimumLength(10).WithMessage("لطفا ایمیل بیشتر از 10 کاراکتر باشد")
@@ -37,7 +37,6 @@ public class UpdateUserDtoValidator : AbstractValidator<UpdateUserDto>
 {
     public UpdateUserDtoValidator()
     {
-        RuleFor(c => c.Id).NotEmpty().WithMessage("لطفا شناسه کاربری را ارسال کنید");
 
         RuleFor(c => c.Email).EmailAddress().WithMessage("لطفا ایمیل به صورت صحیح وارد کنید")
             .MinimumLength(10).WithMessage("لطفا ایمیل بیشتر از 10 کاراکتر باشد")

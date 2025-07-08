@@ -1,5 +1,6 @@
-﻿using MyShop.Application.Common.Interfaces;
-using MyShop.Web.Extensions;
+﻿using System.Security.Claims;
+using MyShop.Application.Common.Interfaces;
+
 
 namespace MyShop.Web.Services;
 
@@ -13,6 +14,11 @@ public class HttpContextService:IHttpContextService
     }
     public int GetUserId()
     {
-       return int.Parse(_httpContextAccessor.HttpContext.User.Identity.Name);
+        string? userIdStr = _httpContextAccessor.HttpContext?.User?.FindFirstValue("Id");
+
+        if (int.TryParse(userIdStr, out var userId))
+            return userId;
+
+        return 0;
     }
 }

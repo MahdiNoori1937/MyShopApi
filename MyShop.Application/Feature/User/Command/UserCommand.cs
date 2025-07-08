@@ -23,20 +23,14 @@ public class UpdateUserCommand : IRequest<UpdateUserStatusDto>
 }
 public class DeleteUserCommand : IRequest<DeleteUserStatusDto>
 {
-    public int Userid { get; set; }
-
-    public DeleteUserCommand(int userid)
-    {
-        Userid = userid;
-    }
 }
 
 public class RegisterUserCommand : IRequest<RegisterUserStatusDto>
 {
     public RegisterUserDto RegisterUserDto { get; set; }
 
-    public RegisterUserCommand(RegisterUserDto RegisterUserDto)
+    public RegisterUserCommand(RegisterUserDto registerUserDto)
     {
-        RegisterUserDto = RegisterUserDto;
+        RegisterUserDto = registerUserDto;
     }
 }

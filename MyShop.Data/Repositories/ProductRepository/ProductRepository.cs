@@ -43,6 +43,6 @@ public class ProductRepository(MyShopContext _db):IProductRepository
 
     public async Task<bool> IsUniqueEmailAsync(string email, DateTime CreateDate)
     {
-        return await _db.Products.AnyAsync(c=>c.ManufactureEmail==email || c.CreateDate==CreateDate);
+        return await _db.Products.AnyAsync(c=>c.ManufactureEmail==email && c.CreateDate==CreateDate);
     }
 }

@@ -1,4 +1,4 @@
-﻿using MyShop.Application.Commonn.Response;
+﻿using MyShop.Application.Common.Response;
 
 namespace MyShop.Application.Extensions;
 
@@ -10,7 +10,7 @@ public class EnumResponse<TEnum> where TEnum : Enum
         {
             Status = Convert.ToInt32(value),
             Message = value.GetDisplayName(),
-            isSuccess = true
+            IsSuccess = true
         };
     }
 }

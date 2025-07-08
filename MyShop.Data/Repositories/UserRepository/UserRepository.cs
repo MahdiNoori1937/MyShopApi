@@ -34,7 +34,11 @@ public class UserRepository(MyShopContext _db): IUserRepository
 
     public IQueryable<User> Query()
     {
-        return _db.Users.AsQueryable();
+        return _db.Users
+            .Where(c=>!c.IsDelete)
+            .Include(c=>c.Products)
+            .OrderBy(c=>c.CreateDate)
+            .AsQueryable();
     }
 
     public async Task<User?> GetByEmailAsync(string email)

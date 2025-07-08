@@ -2,8 +2,8 @@ using FluentValidation;
 using FluentValidation.Results;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using MyShop.Application.Commonn.Messages;
-using MyShop.Application.Commonn.Response;
+using MyShop.Application.Common.Messages;
+using MyShop.Application.Common.Response;
 
 namespace MyShop.Web.Controllers;
 
@@ -11,8 +11,8 @@ namespace MyShop.Web.Controllers;
 [Route("/api/[controller]/[action]")]
 public abstract class ApiBaseController(IMediator mediator, StatusMessageProvider responseMessage) : ControllerBase
 {
-    protected readonly IMediator _mediator = mediator;
-    protected readonly StatusMessageProvider _responseMessage = responseMessage;
+    protected readonly IMediator Mediator = mediator;
+    protected readonly StatusMessageProvider ResponseMessage = responseMessage;
 
     protected IActionResult OkResponse<T>(T data, string message = "عملیات موفقیت‌آمیز بود")
     {
@@ -24,7 +24,7 @@ public abstract class ApiBaseController(IMediator mediator, StatusMessageProvide
         if (Code == null)
             Code = Convert.ToInt32(Status);
         
-        string? message = _responseMessage.GetMessage(Code.Value);
+        string? message = ResponseMessage.GetMessage(Code.Value);
         return Ok(ApiResponseNoData.Success(message));
     }
 
@@ -32,7 +32,7 @@ public abstract class ApiBaseController(IMediator mediator, StatusMessageProvide
     {
         if (Code == null)
             Code = Convert.ToInt32(Status);
-        string? message = _responseMessage.GetMessage(Code.Value);
+        string? message = ResponseMessage.GetMessage(Code.Value);
         return BadRequest(ApiResponseNoData.Failed(message));
     }
 

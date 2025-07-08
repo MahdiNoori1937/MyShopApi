@@ -1,4 +1,4 @@
-﻿using MyShop.Application.Commonn.Security;
+﻿using MyShop.Application.Common.Security;
 using MyShop.Application.Feature.Product.DTOs;
 using MyShop.Application.Feature.User.DTOs;
 using MyShop.Domain.Interfaces.IUserInterface;
@@ -7,29 +7,36 @@ namespace MyShop.Application.Feature.User.Validators.UserValidateService;
 
 public class UserValidateService(IUserRepository userRepository): IUserValidateService
 {
+    #region DeleteValidate
+
     public async Task<DeleteUserStatusDto> DeleteValidate(Domain.Entities.UserEntity.User? user)
     {
         if (user==null)
         {
             return DeleteUserStatusDto.NotFound;
+            
         }
 
         return DeleteUserStatusDto.Success;
     }
 
-    public async Task<UpdateUserStatusDto> UpdateValidate(UpdateUserDto UpdateUserDto, Domain.Entities.UserEntity.User? user)
+    #endregion
+
+    #region UpdateValidate
+
+    public async Task<UpdateUserStatusDto> UpdateValidate(UpdateUserDto updateUserDto, Domain.Entities.UserEntity.User? user)
     {
         if (user==null)
             return UpdateUserStatusDto.NotFound;
         
 
-        if (!SecretHasher.Verify(UpdateUserDto.OldPassword, user.Password))
+        if (!SecretHasher.Verify(updateUserDto.OldPassword, user.Password))
             return UpdateUserStatusDto.NotFound;
         
-        bool isEmailChanged = UpdateUserDto.Email != user.Email;
-        bool isMobileChanged = UpdateUserDto.Phone != user.Phone;
-        string? emailToCheck = isEmailChanged ? UpdateUserDto.Email : null;
-        string? mobileToCheck = isMobileChanged ? UpdateUserDto.Phone : null;
+        bool isEmailChanged = updateUserDto.Email != user.Email;
+        bool isMobileChanged = updateUserDto.Phone != user.Phone;
+        string? emailToCheck = isEmailChanged ? updateUserDto.Email : null;
+        string? mobileToCheck = isMobileChanged ? updateUserDto.Phone : null;
         
         if ((isEmailChanged || isMobileChanged) &&
             await userRepository.IsUserExistAsyncEmailOrMobile(emailToCheck, mobileToCheck))
@@ -38,6 +45,10 @@ public class UserValidateService(IUserRepository userRepository): IUserValidateS
 
         return UpdateUserStatusDto.Success;
     }
+
+    #endregion
+
+    #region CreateValidate
 
     public async Task<CreateUserStatusDto> CreateValidate(CreateUserDto createUserDto)
     {
@@ -48,6 +59,10 @@ public class UserValidateService(IUserRepository userRepository): IUserValidateS
 
         return CreateUserStatusDto.Success;
     }
+
+    #endregion
+
+    #region LoginValidate
 
     public async Task<LoginUserStatusDto> LoginValidate(LoginUserDto Model, Domain.Entities.UserEntity.User? user)
     {
@@ -60,6 +75,10 @@ public class UserValidateService(IUserRepository userRepository): IUserValidateS
         return LoginUserStatusDto.Success;
     }
 
+    #endregion
+
+    #region RegisterValidate
+
     public async Task<RegisterUserStatusDto> RegisterValidate(RegisterUserDto registerUserDto)
     {
        
@@ -70,4 +89,6 @@ public class UserValidateService(IUserRepository userRepository): IUserValidateS
 
         return RegisterUserStatusDto.Success;
     }
+
+    #endregion
 }

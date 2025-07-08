@@ -1,7 +1,8 @@
 ﻿
 using AutoMapper;
 using MediatR;
-using MyShop.Application.Commonn.Security;
+using MyShop.Application.Common.Interfaces;
+using MyShop.Application.Common.Security;
 using MyShop.Application.Feature.User.Command;
 using MyShop.Application.Feature.User.DTOs;
 using MyShop.Application.Feature.User.Queries;
@@ -13,6 +14,8 @@ using MyShop.Domain.Interfaces.IUnitOfWorkInterface;
 using MyShop.Domain.Interfaces.IUserInterface;
 
 namespace MyShop.Application.Feature.User.Handler;
+
+#region CreateUserHandler
 
 public class CreateUserHandler(
     IUserRepository userRepository,
@@ -32,21 +35,27 @@ public class CreateUserHandler(
 
         await userRepository.AddAsync(user);
         await unitOfWorkRepository.SaveChangesAsync();
-        if (user.Id == null)
+        if (user.Id == 0)
             return CreateUserStatusDto.Failed;
         return CreateUserStatusDto.Success;
     }
 }
 
+#endregion
+
+#region UpdateUserHandler
+
 public class UpdateUserHandler(
     IUserRepository userRepository,
     IUnitOfWorkRepository unitOfWorkRepository,
     IMapper mapper,
-    IUserValidateService validator)
+    IUserValidateService validator,
+    IHttpContextService httpContextService)
     : IRequestHandler<UpdateUserCommand, UpdateUserStatusDto>
 {
     public async Task<UpdateUserStatusDto> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
     {
+        request.UserDto.Id=httpContextService.GetUserId();
         Domain.Entities.UserEntity.User user = await userRepository.GetByIdAsync(request.UserDto.Id) ?? new();
 
         UpdateUserStatusDto status = await validator.UpdateValidate(request.UserDto, user);
@@ -55,7 +64,7 @@ public class UpdateUserHandler(
 
         Domain.Entities.UserEntity.User? userMapper = mapper.Map(request.UserDto, user);
 
-        if (request.UserDto.NewPassword != null)
+        if (!string.IsNullOrEmpty(request.UserDto.NewPassword))
         {
             userMapper.Password = SecretHasher.Hash(request.UserDto.NewPassword);
         }
@@ -67,15 +76,20 @@ public class UpdateUserHandler(
     }
 }
 
+#endregion
+
+#region DeleteUserHandler
+
 public class DeleteUserHandler(
     IUserRepository userRepository,
     IUnitOfWorkRepository unitOfWorkRepository,
-    IUserValidateService validator)
+    IUserValidateService validator,
+    IHttpContextService httpContextService)
     : IRequestHandler<DeleteUserCommand, DeleteUserStatusDto>
 {
     public async Task<DeleteUserStatusDto> Handle(DeleteUserCommand request, CancellationToken cancellationToken)
     {
-        Domain.Entities.UserEntity.User user = await userRepository.GetByIdAsync(request.Userid) ?? new();
+        Domain.Entities.UserEntity.User user = await userRepository.GetByIdAsync(httpContextService.GetUserId()) ?? new();
 
         DeleteUserStatusDto status = await validator.DeleteValidate(user);
         if (status != DeleteUserStatusDto.Success)
@@ -89,6 +103,10 @@ public class DeleteUserHandler(
     }
 }
 
+#endregion
+
+#region GetUserHandler
+
 public class GetUserHandler(IUserRepository userRepository, IMapper mapper)
     : IRequestHandler<GetUserQueries, UserDto>
 {
@@ -97,6 +115,10 @@ public class GetUserHandler(IUserRepository userRepository, IMapper mapper)
         return mapper.Map<UserDto>(await userRepository.GetByIdAsync(request.UserId));
     }
 }
+
+#endregion
+
+#region ListUserHandler
 
 public class ListUserHandler(IUserRepository userRepository)
     : IRequestHandler<ListUserQueries, SearchUserDto>
@@ -110,8 +132,8 @@ public class ListUserHandler(IUserRepository userRepository)
             string search = request.SearchUserDto.Search.Trim().ToLower();
             
             query=query.Where(c=>c.FullName.ToLower().Trim().Contains(search)
-            || c.Email.ToLower().Trim().Contains(search)
-            || c.FullName.ToLower().Trim().Contains(search));
+                                 || c.Email.ToLower().Trim().Contains(search)
+                                 || c.FullName.ToLower().Trim().Contains(search));
         }
 
         await request.SearchUserDto.Paging(query.Select(u => new ListUserDto
@@ -120,25 +142,25 @@ public class ListUserHandler(IUserRepository userRepository)
             FullName = u.FullName,
             Email = u.Email,
             Phone = u.Phone,
-            ProductCount = u.Products.Count,
+            ProductCount = u.Products!.Count,
             CreatDate = u.CreateDate
         }));
         return request.SearchUserDto;
     }
 }
 
-public class LoginUserHandler:IRequestHandler<LoginUserQueries,LoginUserStatusDtoClass>
+#endregion
+
+#region LoginUserHandler
+
+public class LoginUserHandler(IUserRepository userRepository, IJwtService jwtService, IUserValidateService validator)
+    : IRequestHandler<LoginUserQueries, LoginUserStatusDtoClass>
 {
-    private readonly IUserRepository userRepository;
-    private readonly IJwtService _jwtService;
-    private readonly LoginUserValidator validator;
-    
-    
     public async Task<LoginUserStatusDtoClass> Handle(LoginUserQueries request, CancellationToken cancellationToken)
     {
         Domain.Entities.UserEntity.User user = await userRepository.GetByEmailAsync(request.LoginUserDto.Email)?? new();
         
-        LoginUserStatusDto status =await validator.Validate(request.LoginUserDto, user);
+        LoginUserStatusDto status =await validator.LoginValidate(request.LoginUserDto, user);
 
         if (status != LoginUserStatusDto.Success)
             return new LoginUserStatusDtoClass
@@ -147,7 +169,7 @@ public class LoginUserHandler:IRequestHandler<LoginUserQueries,LoginUserStatusDt
                 Token = null
             };
         
-        string token = await _jwtService.GetJwtTokenAsync(new ClaimSetDto()
+        string token = await jwtService.GetJwtTokenAsync(new ClaimSetDto()
         {
             Id = user.Id,
         });
@@ -160,26 +182,33 @@ public class LoginUserHandler:IRequestHandler<LoginUserQueries,LoginUserStatusDt
 
     }
 }
+
+#endregion
+
+#region RegisterUserHandler
 public class RegisterUserHandler(
     IUserRepository userRepository,
     IUnitOfWorkRepository unitOfWorkRepository,
     IMapper mapper,
-    RegisterUserValidator validator)
+    IUserValidateService validator)
     : IRequestHandler<RegisterUserCommand, RegisterUserStatusDto>
 {
     public async Task<RegisterUserStatusDto> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
     {
-        RegisterUserStatusDto status = await validator.Validate(request.RegisterUserDto);
+        RegisterUserStatusDto status = await validator.RegisterValidate(request.RegisterUserDto);
         if (status != RegisterUserStatusDto.Success)
             return status;
 
         Domain.Entities.UserEntity.User user = mapper.Map<Domain.Entities.UserEntity.User>(request.RegisterUserDto);
 
-
+        user.Password = SecretHasher.Hash(user.Password);
         await userRepository.AddAsync(user);
         await unitOfWorkRepository.SaveChangesAsync();
-        if (user.Id != null)
+        if (user.Id == 0)
             return RegisterUserStatusDto.Failed;
         return RegisterUserStatusDto.Success;
     }
 }
+
+
+#endregion

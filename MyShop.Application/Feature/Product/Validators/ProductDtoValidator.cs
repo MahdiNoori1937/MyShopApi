@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using MyShop.Application.Common.Interfaces;
-using MyShop.Application.Commonn.Security;
 using MyShop.Application.Feature.Product.DTOs;
 using MyShop.Domain.Interfaces.IProductInterface;
 using MyShop.Domain.Interfaces.IUserInterface;
@@ -14,7 +13,6 @@ public class CreateProductDtoValidator : AbstractValidator<CreateProductDto>
 {
     public CreateProductDtoValidator()
     {
-        RuleFor(c => c.UserId).NotEmpty().WithMessage("لطفا شناسه کاربری را ارسال کنید");
 
         RuleFor(c => c.ManufactureEmail).NotEmpty().WithMessage("لطفا ایمیل محصول را وارد کنید")
             .EmailAddress().WithMessage("لطفا ایمیل به صورت صحیح وارد کنید")

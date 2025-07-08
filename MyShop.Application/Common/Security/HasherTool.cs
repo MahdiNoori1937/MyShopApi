@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
 
-namespace MyShop.Application.Commonn.Security;
+namespace MyShop.Application.Common.Security;
 
 public static class SecretHasher
 {

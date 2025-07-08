@@ -1,6 +1,7 @@
 ﻿using System.Security.Cryptography;
 using AutoMapper;
 using Moq;
+using MyShop.Application.Common.Interfaces;
 using MyShop.Application.Feature.Product.Command;
 using MyShop.Application.Feature.Product.DTOs;
 using MyShop.Application.Feature.Product.Handler;
@@ -22,9 +23,11 @@ public class ProductTest
     private readonly Mock<IUnitOfWorkRepository> _mockUnit;
     private readonly Mock<IProductValidatorService> _mockValidator;
     private readonly Mock<IMapper> _mockMapper;
+    private readonly Mock<IHttpContextService> _mockHttpContext;
 
-    public ProductTest()
+    public ProductTest( )
     {
+        _mockHttpContext = new Mock<IHttpContextService>( );
         _mockRepo = new Mock<IProductRepository>();
         _mockUnit = new Mock<IUnitOfWorkRepository>();
         _mockValidator = new Mock<IProductValidatorService>();
@@ -61,8 +64,10 @@ public class ProductTest
         _mockValidator.Setup(c => c.UpdateValidate(product, dto.UserId)).ReturnsAsync(UpdateProductStatusDto.Success);
         _mockMapper.Setup(c=>c.Map<Product>(product)).Returns(product);
         _mockUnit.Setup(c=>c.SaveChangesAsync()).Returns(Task.CompletedTask);
-        
-        UpdateProductHandler handler = new(_mockRepo.Object, _mockUnit.Object,_mockMapper.Object,_mockValidator.Object);
+        _mockHttpContext.Setup(c=>c.GetUserId()).Returns(dto.UserId);
+
+        UpdateProductHandler handler = 
+            new(_mockRepo.Object, _mockUnit.Object,_mockMapper.Object,_mockValidator.Object,_mockHttpContext.Object);
         UpdateProductCommand command = new(dto);
         
         UpdateProductStatusDto status =await handler.Handle(command, CancellationToken.None);
@@ -105,8 +110,9 @@ public class ProductTest
         _mockValidator.Setup(c => c.UpdateValidate(product, dto.UserId)).ReturnsAsync(UpdateProductStatusDto.Success);
         _mockMapper.Setup(c=>c.Map<Product>(product)).Returns(product);
         _mockUnit.Setup(c=>c.SaveChangesAsync()).Returns(Task.CompletedTask);
-        
-        UpdateProductHandler handler = new(_mockRepo.Object, _mockUnit.Object,_mockMapper.Object,_mockValidator.Object);
+        _mockHttpContext.Setup(c=>c.GetUserId()).Returns(dto.UserId);
+        UpdateProductHandler handler = 
+            new(_mockRepo.Object, _mockUnit.Object,_mockMapper.Object,_mockValidator.Object,_mockHttpContext.Object);
         UpdateProductCommand command = new(dto);
         
         UpdateProductStatusDto status =await handler.Handle(command, CancellationToken.None);
@@ -147,10 +153,10 @@ public class ProductTest
         _mockMapper.Setup(c=>c.Map<Product>(createProductDto)).Returns(product);
         _mockRepo.Setup(c=>c.AddAsync(product)).Returns(Task.CompletedTask);
         _mockUnit.Setup(c=>c.SaveChangesAsync()).Returns(Task.CompletedTask);
+        _mockHttpContext.Setup(c=>c.GetUserId()).Returns(createProductDto.UserId);
         
         
-        
-        CreateProductHandler handler = new(_mockRepo.Object, _mockUnit.Object,_mockMapper.Object, _mockValidator.Object);
+        CreateProductHandler handler = new(_mockRepo.Object, _mockUnit.Object,_mockMapper.Object, _mockValidator.Object,_mockHttpContext.Object);
         CreateProductCommand createProductCommand = new (createProductDto);
         
         
@@ -191,9 +197,9 @@ public class ProductTest
         _mockMapper.Setup(c=>c.Map<Product>(createProductDto)).Returns(product);
         _mockRepo.Setup(r => r.AddAsync(product)).Returns(Task.CompletedTask);
         _mockUnit.Setup(u => u.SaveChangesAsync()).Returns(Task.CompletedTask);
+        _mockHttpContext.Setup(c=>c.GetUserId()).Returns(createProductDto.UserId);
         
-        
-        CreateProductHandler handler = new(_mockRepo.Object, _mockUnit.Object,_mockMapper.Object, _mockValidator.Object);
+        CreateProductHandler handler = new(_mockRepo.Object, _mockUnit.Object,_mockMapper.Object, _mockValidator.Object,_mockHttpContext.Object);
         CreateProductCommand createProductCommand = new (createProductDto);
         
         CreateProductStatusDto result = await handler.Handle(createProductCommand,CancellationToken.None);
@@ -211,7 +217,6 @@ public class ProductTest
     [Fact]
     public async Task Handle_ShouldDeleteProduct_WhenValidationIsSuccessful()
     {
-        // Arrange
         Product product = new ()
         {
             Id = 1,
@@ -227,8 +232,8 @@ public class ProductTest
 
         _mockRepo.Setup(r => r.GetByIdAsync(product.Id)).ReturnsAsync(product);
         _mockValidator.Setup(v => v.DeleteValidate(product, product.UserId)).ReturnsAsync(DeleteProductStatusDto.Success);
-
-        DeleteProductHandler handler = new(_mockRepo.Object, _mockUnit.Object, _mockValidator.Object);
+        _mockHttpContext.Setup(c=>c.GetUserId()).Returns(product.UserId);
+        DeleteProductHandler handler = new(_mockRepo.Object, _mockUnit.Object, _mockValidator.Object,_mockHttpContext.Object);
 
         DeleteProductDto dto = new ()
         {
@@ -262,8 +267,8 @@ public class ProductTest
 
         _mockRepo.Setup(r => r.GetByIdAsync(product.Id)).ReturnsAsync(product);
         _mockValidator.Setup(v => v.DeleteValidate(product, product.UserId)).ReturnsAsync(DeleteProductStatusDto.Failed);
-
-        DeleteProductHandler handler = new(_mockRepo.Object, _mockUnit.Object, _mockValidator.Object);
+        _mockHttpContext.Setup(c=>c.GetUserId()).Returns(product.UserId);
+        DeleteProductHandler handler = new(_mockRepo.Object, _mockUnit.Object, _mockValidator.Object,_mockHttpContext.Object);
 
         DeleteProductDto dto = new ()
         {

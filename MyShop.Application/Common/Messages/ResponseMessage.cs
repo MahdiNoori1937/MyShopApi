@@ -1,4 +1,4 @@
-﻿namespace MyShop.Application.Commonn.Messages;
+﻿namespace MyShop.Application.Common.Messages;
 
 public class StatusMessageProvider
 {
@@ -26,6 +26,7 @@ public class StatusMessageProvider
         [400] = "شماره تماس یا ایمیل در سایت وجود دارد لطفا موارد ایمیل یا موبایل دیگری راامتحان کنید",
         [401] = "عملیات شما با شکست مواجه شده است",
         [402] = "حساب کاربری شما پیدا نشد",
+        
 
         #endregion
 
@@ -35,6 +36,7 @@ public class StatusMessageProvider
         [411] = "عملیات شما با شکست مواجه شده است",
         [412] = "محصول شما پیدا نشد",
         [413] = "شما مجوز برای تقیر این محصول را ندارید",
+        [414] = "محصول پیدا نشد",
 
         #endregion
     };

@@ -3,11 +3,12 @@ using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using MyShop.Application.Common.Interfaces;
 using MyShop.Application.Feature.User.Validators;
 using MyShop.Data.Context;
 using MyShop.Domain.Common;
 using MyShop.IOC.DependencyInjection;
-using MyShop.Web.MiddleWare;
+using MyShop.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +28,12 @@ builder.Services.AddDbContext<MyShopContext>(option =>
     option.UseSqlServer(connectionString);
 });
 
+builder.Services.AddMediatR(option =>
+{
+    option.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());
+});
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
 builder.Services.IOC();
 
 builder.Services.AddValidatorsFromAssemblyContaining<CreateUserDtoValidator>();
@@ -39,7 +46,7 @@ builder.Services.AddHttpContextAccessor();
 
 #region Jwt
 
-string Signiture = builder.Configuration.GetValue<string>("MyApiSecurityKey:SecurityKey")?? "";
+string signiture = builder.Configuration.GetValue<string>("MyApiSecurityKey:SecurityKey")?? "";
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(option =>
     {
@@ -48,7 +55,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidIssuer = "https://localhost:7151",
             ValidAudience = "https://localhost:7151",
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Signiture)),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signiture)),
             ValidateIssuer = true,
             ValidateAudience = true,
         };
@@ -56,7 +63,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 #endregion
 
-
+builder.Services.AddScoped<IHttpContextService, HttpContextService>();
 WebApplication app = builder.Build();
 using (IServiceScope scope = app.Services.CreateScope())
 {
@@ -70,7 +77,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseMiddleware<ValidationMiddleware>();
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();

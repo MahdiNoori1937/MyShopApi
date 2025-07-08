@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using MyShop.Application.Commonn.Messages;
+using MyShop.Application.Common.Messages;
 using MyShop.Application.Extensions;
 using MyShop.Application.Feature.Product.DTOs;
 using MyShop.Application.Feature.Product.Queries;
@@ -9,12 +9,11 @@ using MyShop.Application.Feature.User.DTOs;
 using MyShop.Application.Feature.User.Queries;
 using MyShop.Application.Feature.User.Validators;
 using MyShop.Domain.Interfaces.IUserInterface;
-using MyShop.Web.Extensions;
 using MyShop.Web.Filters.Permisions;
 
 namespace MyShop.Web.Controllers;
 
-public class UserController(IMediator mediator, StatusMessageProvider responseMessage,IUserRepository userRepository)
+public class UserController(IMediator mediator, StatusMessageProvider responseMessage)
     : ApiBaseController(mediator, responseMessage)
 {
     #region GetAll
@@ -22,7 +21,7 @@ public class UserController(IMediator mediator, StatusMessageProvider responseMe
     [HttpGet]
     public async Task<IActionResult> GetAll([FromBody] SearchUserDto request)
     {
-        SearchUserDto Model = await _mediator.Send(new ListUserQueries(request));
+        SearchUserDto Model = await Mediator.Send(new ListUserQueries(request));
         if (Model.Entities.IsNullOrEmpty())
             return BadRequestResponse(null, 404);
 
@@ -36,7 +35,7 @@ public class UserController(IMediator mediator, StatusMessageProvider responseMe
     [HttpGet]
     public async Task<IActionResult> GetById([FromQuery] int id)
     {
-        UserDto model = await _mediator.Send(new GetUserQueries(id));
+        UserDto model = await Mediator.Send(new GetUserQueries(id));
         if (model.ModelIsNull())
             return BadRequestResponse(null, 400);
 
@@ -50,11 +49,11 @@ public class UserController(IMediator mediator, StatusMessageProvider responseMe
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateUserDto request)
     {
-        IActionResult? Validation = await HandleValidationAsync(new CreateUserDtoValidator(userRepository), request);
+        IActionResult? Validation = await HandleValidationAsync(new CreateUserDtoValidator(), request);
         if (Validation is not null)
             return Validation;
 
-        CreateUserStatusDto status = await _mediator.Send(new CreateUserCommand(request));
+        CreateUserStatusDto status = await Mediator.Send(new CreateUserCommand(request));
         if (status != CreateUserStatusDto.Success)
             return BadRequestResponse(status);
 
@@ -72,9 +71,8 @@ public class UserController(IMediator mediator, StatusMessageProvider responseMe
         IActionResult? Validation = await HandleValidationAsync(new UpdateUserDtoValidator(), request);
         if (Validation is not null)
             return Validation;
-
-        request.Id = HttpContext.GetUserId().Value;
-        UpdateUserStatusDto status = await _mediator.Send(new UpdateUserCommand(request));
+        
+        UpdateUserStatusDto status = await Mediator.Send(new UpdateUserCommand(request));
         if (status != UpdateUserStatusDto.Success)
             return BadRequestResponse(status);
 
@@ -89,7 +87,7 @@ public class UserController(IMediator mediator, StatusMessageProvider responseMe
     [Permissions]
     public async Task<IActionResult> Delete()
     {
-        DeleteUserStatusDto status = await _mediator.Send(new DeleteUserCommand(HttpContext.GetUserId().Value));
+        DeleteUserStatusDto status = await Mediator.Send(new DeleteUserCommand());
         if (status != DeleteUserStatusDto.Success)
             return BadRequestResponse(status);
 

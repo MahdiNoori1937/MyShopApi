@@ -4,18 +4,20 @@ using MyShop.Application.Feature.User.DTOs;
 
 namespace MyShop.Application.Feature.Product.MappingProfiles;
 
-public class UserProfiles:Profile
+public class ProductProfiles:Profile
 {
-    public UserProfiles()
+    public ProductProfiles()
     {
-        CreateMap<CreateUserDto, Domain.Entities.UserEntity.User>()
+        CreateMap<CreateProductDto, Domain.Entities.ProductEntity.Product>()
             .ForMember(set => set.CreateDate, opt
                 => opt.MapFrom(src => DateTime.Now))
             .ForMember(set => set.IsDelete, opt => opt
-                .MapFrom(src => false));
+                .MapFrom(src => false));  
+        
+       
 
-        CreateMap<UpdateUserDto, Domain.Entities.UserEntity.User>();
-        CreateMap<Domain.Entities.UserEntity.User, UserDto>();
+        CreateMap<UpdateProductDto, Domain.Entities.ProductEntity.Product>();
+        CreateMap<Domain.Entities.ProductEntity.Product, ProductDto>();
 
     }
 }

@@ -2,21 +2,20 @@
 
 public enum CreateProductStatusDto
 {
-    DuplicateInformation=400,
-    Success=200,
+    DuplicateInformation=410,
+    Success=210,
     Failed=401
 }
 public enum UpdateProductStatusDto
 {
-    Success=201,
-    Failed=401,
-    DontHavePermission=402,
+    Success=211,
+    DontHavePermission=413,
     NotFound=402
 }
 public enum DeleteProductStatusDto
 {
-    Success=203,
-    Failed=401,
-    NotFound=402,
-    DontHavePermission=402,
+    Success=212,
+    Failed=411,
+    NotFound=412,
+    DontHavePermission=413,
 }

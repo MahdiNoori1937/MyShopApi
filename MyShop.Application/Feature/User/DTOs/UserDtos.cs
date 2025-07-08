@@ -17,15 +17,15 @@ public class UpdateUserDto
 {
     public int Id { get; set; }
     
-    public string FullName { get; set; }
+    public string? FullName { get; set; }
 
-    public string Email { get; set; }
+    public string? Email { get; set; }
 
-    public string Phone { get; set; }
+    public string? Phone { get; set; }
 
     public string OldPassword { get; set; }
     
-    public string NewPassword { get; set; }
+    public string? NewPassword { get; set; }
 }
 
 public class SearchUserDto:BasePaging<ListUserDto>
@@ -59,7 +59,7 @@ public class UserDto
 
     public string Phone { get; set; }
     
-    public DateTime CreatDate { get; set; }
+    public DateTime CreateDate { get; set; }
 }
 
 public class LoginUserDto

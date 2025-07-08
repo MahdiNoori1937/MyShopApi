@@ -5,6 +5,8 @@ namespace MyShop.Application.Feature.Product.Validators.ProductValidateService;
 
 public class ProductValidateService(IProductRepository productRepository):IProductValidatorService
 {
+    #region DeleteValidate
+
     public async Task<DeleteProductStatusDto> DeleteValidate(Domain.Entities.ProductEntity.Product? product, int userId)
     {
         if (product==null)
@@ -16,6 +18,10 @@ public class ProductValidateService(IProductRepository productRepository):IProdu
         return DeleteProductStatusDto.Success;
     }
 
+    #endregion
+
+    #region UpdateValidate
+
     public async Task<UpdateProductStatusDto> UpdateValidate(Domain.Entities.ProductEntity.Product? product, int userId)
     {
         if (product==null)
@@ -26,6 +32,10 @@ public class ProductValidateService(IProductRepository productRepository):IProdu
         return UpdateProductStatusDto.Success;
     }
 
+    #endregion
+
+    #region CreateValidate
+
     public async Task<CreateProductStatusDto> CreateValidate(CreateProductDto createProductDto)
     {
         if (await productRepository.IsUniqueEmailAsync(createProductDto.ManufactureEmail,DateTime.Now))
@@ -35,4 +45,6 @@ public class ProductValidateService(IProductRepository productRepository):IProdu
 
         return CreateProductStatusDto.Success;
     }
+
+    #endregion
 }

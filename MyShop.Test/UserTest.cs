@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Moq;
-using MyShop.Application.Commonn.Security;
+using MyShop.Application.Common.Interfaces;
+using MyShop.Application.Common.Security;
 using MyShop.Application.Feature.User.Command;
 using MyShop.Application.Feature.User.DTOs;
 using MyShop.Application.Feature.User.Handler;
@@ -19,9 +20,11 @@ public class UserTest
     private readonly Mock<IUnitOfWorkRepository> _mockUnit;
     private readonly Mock<IUserValidateService> _mockValidator;
     private readonly Mock<IMapper> _mockMapper;
+    private readonly Mock<IHttpContextService> _httpContextService;
     
     public UserTest()
     {
+        _httpContextService= new Mock<IHttpContextService>();
         _mockRepo = new Mock<IUserRepository>();
         _mockUnit = new Mock<IUnitOfWorkRepository>();
         _mockValidator = new Mock<IUserValidateService>();
@@ -153,8 +156,8 @@ public class UserTest
             Password = dto.NewPassword,
         };
         
+        _httpContextService.Setup(c=>c.GetUserId()).Returns(dto.Id);
         _mockRepo.Setup(c=>c.GetByIdAsync(dto.Id)).ReturnsAsync(user1);
-        
         _mockValidator.Setup(c => c.UpdateValidate(dto,user1)).ReturnsAsync(UpdateUserStatusDto.Success);
         _mockRepo.Setup(c=>c.UpdateAsync(user2)).Returns(Task.CompletedTask);
         _mockMapper.Setup(m => m.Map<UpdateUserDto, User>(dto, user1))
@@ -162,7 +165,7 @@ public class UserTest
         
 
         UpdateUserCommand command = new(dto);
-        UpdateUserHandler handler = new(_mockRepo.Object, _mockUnit.Object, _mockMapper.Object,_mockValidator.Object);
+        UpdateUserHandler handler = new(_mockRepo.Object, _mockUnit.Object, _mockMapper.Object,_mockValidator.Object,_httpContextService.Object);
         UpdateUserStatusDto status = await handler.Handle(command, CancellationToken.None);
         
         Assert.Equal(UpdateUserStatusDto.Success, status);
@@ -207,7 +210,7 @@ public class UserTest
             Phone = dto.Phone,
             Password = dto.NewPassword,
         };
-        
+        _httpContextService.Setup(c=>c.GetUserId()).Returns(dto.Id);
         _mockRepo.Setup(c=>c.GetByIdAsync(dto.Id)).ReturnsAsync(user1);
         
         _mockValidator.Setup(c => c.UpdateValidate(dto,user1)).ReturnsAsync(UpdateUserStatusDto.Failed);
@@ -217,7 +220,7 @@ public class UserTest
             .Returns(user2);
         
         UpdateUserCommand command = new(dto);
-        UpdateUserHandler handler = new(_mockRepo.Object, _mockUnit.Object, _mockMapper.Object,_mockValidator.Object);
+        UpdateUserHandler handler = new(_mockRepo.Object, _mockUnit.Object, _mockMapper.Object,_mockValidator.Object,_httpContextService.Object);
         UpdateUserStatusDto status = await handler.Handle(command, CancellationToken.None);
         
         Assert.Equal(UpdateUserStatusDto.Failed, status);
@@ -241,12 +244,13 @@ public class UserTest
         };
         
         _mockRepo.Setup(c=>c.GetByIdAsync(user.Id)).ReturnsAsync(user);
+        _httpContextService.Setup(c=>c.GetUserId()).Returns(user.Id);
         _mockValidator.Setup(c=>c.DeleteValidate(user)).ReturnsAsync(DeleteUserStatusDto.Success);  
         _mockRepo.Setup(c=>c.UpdateAsync(user)).Returns(Task.CompletedTask);
 
-        DeleteUserCommand command = new(user.Id);
+        DeleteUserCommand command = new();
         
-        DeleteUserHandler handler = new(_mockRepo.Object, _mockUnit.Object,_mockValidator.Object);
+        DeleteUserHandler handler = new(_mockRepo.Object, _mockUnit.Object,_mockValidator.Object,_httpContextService.Object);
         
         DeleteUserStatusDto status = await handler.Handle(command, CancellationToken.None);
         
@@ -271,12 +275,13 @@ public class UserTest
         };
         
         _mockRepo.Setup(c=>c.GetByIdAsync(user.Id)).ReturnsAsync(user);
+        _httpContextService.Setup(c=>c.GetUserId()).Returns(user.Id);
         _mockValidator.Setup(c=>c.DeleteValidate(user)).ReturnsAsync(DeleteUserStatusDto.Failed);  
      
 
-        DeleteUserCommand command = new(user.Id);
+        DeleteUserCommand command = new();
         
-        DeleteUserHandler handler = new(_mockRepo.Object, _mockUnit.Object,_mockValidator.Object);
+        DeleteUserHandler handler = new(_mockRepo.Object, _mockUnit.Object,_mockValidator.Object,_httpContextService.Object);
         
         DeleteUserStatusDto status = await handler.Handle(command, CancellationToken.None);
         
