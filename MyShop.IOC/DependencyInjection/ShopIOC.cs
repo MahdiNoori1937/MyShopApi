@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using MyShop.Application.Feature.Product.Validators;
+using MyShop.Application.Feature.Product.Validators.ProductValidateService;
 using MyShop.Application.Feature.User.Validators;
+using MyShop.Application.Feature.User.Validators.UserValidateService;
 using MyShop.Data.Repositories.ProductRepository;
 using MyShop.Data.Repositories.UserRepository;
 using MyShop.Domain.Interfaces.IProductInterface;
@@ -21,16 +23,11 @@ public static class ShopIOC
 
         #region Validators
 
-        services.AddScoped<CreateProductValidator>();
-        services.AddScoped<UpdateProductValidator>();  
-        services.AddScoped<DeleteProductValidator>();  
-        
-        services.AddScoped<CreateUserValidator>();
-        services.AddScoped<UpdateUserValidator>();
-        services.AddScoped<DeleteUserValidator>();
-        services.AddScoped<LoginUserValidator>();
-        services.AddScoped<RegisterUserValidator>();
+        services.AddScoped<IProductValidatorService,ProductValidateService>();
+        services.AddScoped<IUserValidateService,UserValidateService>();
+   
 
         #endregion
+        
     }
 }

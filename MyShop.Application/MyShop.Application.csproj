@@ -7,8 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Commonn\Dtos\" />
-      <Folder Include="Commonn\Interfaces\" />
+      <Folder Include="Common\Dtos\" />
     </ItemGroup>
 
     <ItemGroup>

@@ -7,6 +7,7 @@ using MyShop.Application.Feature.User.Validators;
 using MyShop.Data.Context;
 using MyShop.Domain.Common;
 using MyShop.IOC.DependencyInjection;
+using MyShop.Web.MiddleWare;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,6 +35,7 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.Configure<MyApiSecurityKey>(builder.Configuration.GetSection("MyApiSecurityKey"));
 
+builder.Services.AddHttpContextAccessor();
 
 #region Jwt
 
@@ -68,6 +70,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseMiddleware<ValidationMiddleware>();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();

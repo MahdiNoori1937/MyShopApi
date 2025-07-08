@@ -4,6 +4,7 @@ using MyShop.Application.Feature.Product.Command;
 using MyShop.Application.Feature.Product.DTOs;
 using MyShop.Application.Feature.Product.Queries;
 using MyShop.Application.Feature.Product.Validators;
+using MyShop.Application.Feature.Product.Validators.ProductValidateService;
 using MyShop.Domain.Interfaces.IProductInterface;
 using MyShop.Domain.Interfaces.IUnitOfWorkInterface;
 
@@ -13,12 +14,12 @@ public class CreateProductHandler(
     IProductRepository productRepository,
     IUnitOfWorkRepository unitOfWorkRepository,
     IMapper mapper,
-    CreateProductValidator validator)
+    IProductValidatorService validator)
     : IRequestHandler<CreateProductCommand, CreateProductStatusDto>
 {
     public async Task<CreateProductStatusDto> Handle(CreateProductCommand request, CancellationToken cancellationToken)
     {
-        CreateProductStatusDto status = await validator.Validate(request.ProductDto);
+        CreateProductStatusDto status = await validator.CreateValidate(request.ProductDto);
         if (status != CreateProductStatusDto.Success)
             return status;
         
@@ -27,7 +28,7 @@ public class CreateProductHandler(
         
             await productRepository.AddAsync(product);
             await unitOfWorkRepository.SaveChangesAsync();
-            if (product.Id != null)
+            if (product.Id == null)
                 return CreateProductStatusDto.Failed;
             return CreateProductStatusDto.Success;
     }
@@ -37,14 +38,14 @@ public class UpdateProductHandler(
     IProductRepository productRepository,
     IUnitOfWorkRepository unitOfWorkRepository,
     IMapper mapper,
-    UpdateProductValidator validator)
+    IProductValidatorService validator)
     : IRequestHandler<UpdateProductCommand, UpdateProductStatusDto>
 {
     public async Task<UpdateProductStatusDto> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
     {
         Domain.Entities.ProductEntity.Product product = await productRepository.GetByIdAsync(request.ProductDto.Id)?? new();
         
-        UpdateProductStatusDto status = await validator.Validate(product,request.ProductDto.UserId);
+        UpdateProductStatusDto status = await validator.UpdateValidate(product,request.ProductDto.UserId);
         if (status != UpdateProductStatusDto.Success)
             return status;
         
@@ -59,14 +60,14 @@ public class UpdateProductHandler(
 public class DeleteProductHandler(
     IProductRepository productRepository,
     IUnitOfWorkRepository unitOfWorkRepository,
-    DeleteProductValidator validator)
+    IProductValidatorService validator)
     : IRequestHandler<DeleteProductCommand, DeleteProductStatusDto>
 {
     public async Task<DeleteProductStatusDto> Handle(DeleteProductCommand request, CancellationToken cancellationToken)
     {
-       Domain.Entities.ProductEntity.Product product = await productRepository.GetByIdAsync(request.ProductDto.UserId)?? new();
+       Domain.Entities.ProductEntity.Product product = await productRepository.GetByIdAsync(request.ProductDto.ProductId)?? new();
        
-       DeleteProductStatusDto status = await validator.Validate(product,request.ProductDto.UserId);
+       DeleteProductStatusDto status = await validator.DeleteValidate(product,request.ProductDto.UserId);
        if (status != DeleteProductStatusDto.Success)
            return status;
        

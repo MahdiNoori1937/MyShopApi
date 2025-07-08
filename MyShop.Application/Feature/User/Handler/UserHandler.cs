@@ -6,6 +6,7 @@ using MyShop.Application.Feature.User.Command;
 using MyShop.Application.Feature.User.DTOs;
 using MyShop.Application.Feature.User.Queries;
 using MyShop.Application.Feature.User.Validators;
+using MyShop.Application.Feature.User.Validators.UserValidateService;
 using MyShop.Domain.Common;
 using MyShop.Domain.Interfaces.IJwtInterface;
 using MyShop.Domain.Interfaces.IUnitOfWorkInterface;
@@ -17,12 +18,12 @@ public class CreateUserHandler(
     IUserRepository userRepository,
     IUnitOfWorkRepository unitOfWorkRepository,
     IMapper mapper,
-    CreateUserValidator validator)
+    IUserValidateService validator)
     : IRequestHandler<CreateUserCommand, CreateUserStatusDto>
 {
     public async Task<CreateUserStatusDto> Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
-        CreateUserStatusDto status = await validator.Validate(request.UserDto);
+        CreateUserStatusDto status = await validator.CreateValidate(request.UserDto);
         if (status != CreateUserStatusDto.Success)
             return status;
 
@@ -31,7 +32,7 @@ public class CreateUserHandler(
 
         await userRepository.AddAsync(user);
         await unitOfWorkRepository.SaveChangesAsync();
-        if (user.Id != null)
+        if (user.Id == null)
             return CreateUserStatusDto.Failed;
         return CreateUserStatusDto.Success;
     }
@@ -41,14 +42,14 @@ public class UpdateUserHandler(
     IUserRepository userRepository,
     IUnitOfWorkRepository unitOfWorkRepository,
     IMapper mapper,
-    UpdateUserValidator validator)
+    IUserValidateService validator)
     : IRequestHandler<UpdateUserCommand, UpdateUserStatusDto>
 {
     public async Task<UpdateUserStatusDto> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
     {
         Domain.Entities.UserEntity.User user = await userRepository.GetByIdAsync(request.UserDto.Id) ?? new();
 
-        UpdateUserStatusDto status = await validator.Validate(request.UserDto, user);
+        UpdateUserStatusDto status = await validator.UpdateValidate(request.UserDto, user);
         if (status != UpdateUserStatusDto.Success)
             return status;
 
@@ -69,14 +70,14 @@ public class UpdateUserHandler(
 public class DeleteUserHandler(
     IUserRepository userRepository,
     IUnitOfWorkRepository unitOfWorkRepository,
-    DeleteUserValidator validator)
+    IUserValidateService validator)
     : IRequestHandler<DeleteUserCommand, DeleteUserStatusDto>
 {
     public async Task<DeleteUserStatusDto> Handle(DeleteUserCommand request, CancellationToken cancellationToken)
     {
         Domain.Entities.UserEntity.User user = await userRepository.GetByIdAsync(request.Userid) ?? new();
 
-        DeleteUserStatusDto status = await validator.Validate(user);
+        DeleteUserStatusDto status = await validator.DeleteValidate(user);
         if (status != DeleteUserStatusDto.Success)
             return status;
 

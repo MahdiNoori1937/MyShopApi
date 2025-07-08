@@ -8,12 +8,13 @@ using MyShop.Application.Feature.User.Command;
 using MyShop.Application.Feature.User.DTOs;
 using MyShop.Application.Feature.User.Queries;
 using MyShop.Application.Feature.User.Validators;
+using MyShop.Domain.Interfaces.IUserInterface;
 using MyShop.Web.Extensions;
 using MyShop.Web.Filters.Permisions;
 
 namespace MyShop.Web.Controllers;
 
-public class UserController(IMediator mediator, StatusMessageProvider responseMessage)
+public class UserController(IMediator mediator, StatusMessageProvider responseMessage,IUserRepository userRepository)
     : ApiBaseController(mediator, responseMessage)
 {
     #region GetAll
@@ -49,7 +50,7 @@ public class UserController(IMediator mediator, StatusMessageProvider responseMe
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateUserDto request)
     {
-        IActionResult? Validation = await HandleValidationAsync(new CreateUserDtoValidator(), request);
+        IActionResult? Validation = await HandleValidationAsync(new CreateUserDtoValidator(userRepository), request);
         if (Validation is not null)
             return Validation;
 

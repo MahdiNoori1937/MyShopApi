@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using MyShop.Application.Feature.User.DTOs;
+using MyShop.Domain.Interfaces.IUserInterface;
 
 namespace MyShop.Application.Feature.User.Validators;
 
@@ -7,7 +8,7 @@ namespace MyShop.Application.Feature.User.Validators;
 
 public class CreateUserDtoValidator : AbstractValidator<CreateUserDto>
 {
-    public CreateUserDtoValidator()
+    public CreateUserDtoValidator(IUserRepository repo)
     {
         RuleFor(c => c.Email).EmailAddress().WithMessage("لطفا ایمیل به صورت صحیح وارد کنید")
             .MinimumLength(10).WithMessage("لطفا ایمیل بیشتر از 10 کاراکتر باشد")
@@ -24,6 +25,7 @@ public class CreateUserDtoValidator : AbstractValidator<CreateUserDto>
         RuleFor(c => c.Password).NotEmpty().WithMessage("لطفا رمز عبور خود را انتخاب کنید")
             .MinimumLength(4).WithMessage("لطفا رمز عبور بیشتر از 4 کاراکتر باشد")
             .MaximumLength(50).WithMessage("لطفا رمز عبور کمتر از 50 کاراکتر باشد");
+        
     }
 }
 
