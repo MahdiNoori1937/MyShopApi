@@ -26,4 +26,4 @@ Docker-Compose up --build -d
 
 1. ریپوزیتوری را کلون کنید:
    ```bash
-   git clone https://github.com/your-username/myshop.git
+   git clone https://github.com/MahdiNoori1937/MyShopApi.git
